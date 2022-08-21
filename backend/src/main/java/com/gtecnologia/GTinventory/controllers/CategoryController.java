@@ -1,3 +1,4 @@
+
 package com.gtecnologia.GTinventory.controllers;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gtecnologia.GTinventory.dtos.CategoryDTO;
 import com.gtecnologia.GTinventory.entities.Category;
 import com.gtecnologia.GTinventory.services.CategoryService;
 
@@ -19,10 +21,9 @@ public class CategoryController {
 	private CategoryService service;
 
 	@GetMapping
-	public ResponseEntity<List<Category>> findAll() {
+	public ResponseEntity<List<CategoryDTO>> findAll() {
 
-		List<Category> list = service.findAll();
-
+		List<CategoryDTO> list = service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 }
