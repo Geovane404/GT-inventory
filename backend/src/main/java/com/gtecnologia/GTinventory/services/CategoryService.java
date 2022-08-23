@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gtecnologia.GTinventory.dtos.CategoryDTO;
 import com.gtecnologia.GTinventory.entities.Category;
 import com.gtecnologia.GTinventory.repositories.CategoryRepository;
+import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @Service
 public class CategoryService {
@@ -37,7 +38,8 @@ public class CategoryService {
 	@Transactional(readOnly = true)
 	public CategoryDTO findById(Long id) {
 
-		Category entity = repository.findById(id).get();
+		Optional<Category> obj = repository.findById(id);
+		Category entity = obj.orElseThrow(() -> new ResourceNotFoundException("Id não encontrado!"));
 		return new CategoryDTO(entity);
 	}
 
