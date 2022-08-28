@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +25,7 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
-	
+
 	@Autowired
 	private CategoryRepository categoryRepository;
 
@@ -49,28 +51,43 @@ public class ProductService {
 		return new ProductDTO(entity);
 	}
 
-	@Transactional()
+	@Transactional
 	public ProductDTO insert(ProductDTO dto) {
-		
+
 		Product entity = new Product();
 		copyDtoToEntity(entity, dto);
 		entity = repository.save(entity);
 		return new ProductDTO(entity);
 	}
 
+	@Transactional
+	public ProductDTO update(Long id, ProductDTO dto) {
+
+		try {
+			Product entity = repository.getOne(id);
+			copyDtoToEntity(entity, dto);
+			entity = repository.save(entity);
+			return new ProductDTO(entity);
+
+		} catch (EntityNotFoundException e) {
+
+			throw new ResourceNotFoundException("Id não encontrado!");
+		}
+	}
+
 	
 	private void copyDtoToEntity(Product entity, ProductDTO dto) {
-		
+
 		entity.setName(dto.getName());
 		entity.setDescription(dto.getDescription());
 		entity.setPrice(dto.getPrice());
 		entity.setImgUrl(dto.getImgUrl());
 		entity.setDate(dto.getDate());
-		
+
 		entity.getCategories().clear();
-		
-		for(CategoryDTO catDto : dto.getCategories()) {
-			
+
+		for (CategoryDTO catDto : dto.getCategories()) {
+
 			Category category = categoryRepository.getOne(catDto.getId());
 			entity.getCategories().add(category);
 		}
