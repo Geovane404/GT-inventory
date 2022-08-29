@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.gtecnologia.GTinventory.services.exception.DatabaseException;
 import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -23,6 +24,21 @@ public class ResourceExceptionHandler {
 		err.setTimesTamp(Instant.now());
 		err.setStatus(status.value());
 		err.setError("Recurso não encontrado!");
+		err.setMessage(e.getMessage());
+		err.setPath(request.getRequestURI());
+
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(DatabaseException.class)
+	public ResponseEntity<StandardError> database(HttpServletRequest request, DatabaseException e) {
+
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		StandardError err = new StandardError();
+
+		err.setTimesTamp(Instant.now());
+		err.setStatus(status.value());
+		err.setError("Exceção do banco de dados");
 		err.setMessage(e.getMessage());
 		err.setPath(request.getRequestURI());
 
