@@ -1,6 +1,7 @@
 package com.gtecnologia.GTinventory.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,11 +20,15 @@ public class ProductRepositoryTest {
 	private ProductRepository repository;
 	
 	private PageRequest pageRequest;
+	private long existingId;
+	private long nonExistingId;
 	
 	@BeforeEach
 	void setUp() throws Exception{
 		
 		pageRequest = PageRequest.of(0, 12);
+		existingId = 1L;
+		nonExistingId = 1000L;
 	}
 	
 	
@@ -41,6 +46,26 @@ public class ProductRepositoryTest {
 		List<Product> result = repository.findAll();
 		
 		Assertions.assertFalse(result.isEmpty());
+	}
+	
+	@Test
+	public void findByIdShouldReturnOptionalNotNullWhenIdExist() {
+		
+		Optional<Product> result = repository.findById(existingId);
+		
+		Assertions.assertTrue(result.isPresent());
+		Assertions.assertNotEquals(this.existingId, result);
+		Assertions.assertNotNull(result);
+		Assertions.assertFalse(result.isEmpty());
+	}
+	
+	@Test
+	public void findByIdShouldReturnOptionalNullWhenIdNoExist() {
+		
+		Optional<Product> result = repository.findById(nonExistingId);
+		
+		Assertions.assertFalse(result.isPresent());
+		Assertions.assertTrue(result.isEmpty());
 	}
 	
 }
