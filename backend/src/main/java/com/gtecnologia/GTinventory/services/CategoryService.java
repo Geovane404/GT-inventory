@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gtecnologia.GTinventory.dtos.CategoryDTO;
 import com.gtecnologia.GTinventory.entities.Category;
 import com.gtecnologia.GTinventory.repositories.CategoryRepository;
+import com.gtecnologia.GTinventory.services.exception.DatabaseException;
 import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @Service
@@ -67,7 +69,6 @@ public class CategoryService {
 		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Id não encontrado!");
 		}
-		
 	}
 
 	public void delete(Long id) {
@@ -77,6 +78,9 @@ public class CategoryService {
 			
 		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException("Id não encontrado!");
+		}
+		catch(DataIntegrityViolationException e) {
+			throw new DatabaseException("Violação de integridade! você não pode excluir uma entidade que possui dependentes.");
 		}
 	}
 	
