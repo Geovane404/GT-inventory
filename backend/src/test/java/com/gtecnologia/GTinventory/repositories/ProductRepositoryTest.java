@@ -1,5 +1,8 @@
 package com.gtecnologia.GTinventory.repositories;
 
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.gtecnologia.GTinventory.entities.Product;
+import com.gtecnologia.GTinventory.factory.Factory;
 
 @DataJpaTest
 public class ProductRepositoryTest {
@@ -22,6 +26,7 @@ public class ProductRepositoryTest {
 	private PageRequest pageRequest;
 	private long existingId;
 	private long nonExistingId;
+	private long countTotalProduct;
 	
 	@BeforeEach
 	void setUp() throws Exception{
@@ -29,6 +34,7 @@ public class ProductRepositoryTest {
 		pageRequest = PageRequest.of(0, 12);
 		existingId = 1L;
 		nonExistingId = 1000L;
+		countTotalProduct = 25L;
 	}
 	
 	
@@ -66,6 +72,17 @@ public class ProductRepositoryTest {
 		
 		Assertions.assertFalse(result.isPresent());
 		Assertions.assertTrue(result.isEmpty());
+	}
+	
+	@Test
+	public void saveShouldPersistWithAutoIncrementWhenIdIsNull() {
+		
+		Product product = Factory.createProduct();
+		product.setId(null);
+		product = repository.save(product);
+		 
+		 Assertions.assertEquals(countTotalProduct + 1, product.getId());
+		 Assertions.assertNotNull(product.getId());
 	}
 	
 }
