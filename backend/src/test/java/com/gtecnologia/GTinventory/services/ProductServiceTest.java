@@ -2,6 +2,9 @@ package com.gtecnologia.GTinventory.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +24,7 @@ import com.gtecnologia.GTinventory.dtos.ProductDTO;
 import com.gtecnologia.GTinventory.entities.Product;
 import com.gtecnologia.GTinventory.factory.Factory;
 import com.gtecnologia.GTinventory.repositories.ProductRepository;
+import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @ExtendWith(SpringExtension.class)
 public class ProductServiceTest {
@@ -34,6 +38,9 @@ public class ProductServiceTest {
 	private Product product;
 	private PageImpl<Product> page;
 	private List<Product> list;
+	
+	private long existingId;
+	private long nonExistingId;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -43,9 +50,14 @@ public class ProductServiceTest {
 
 		list = new ArrayList<>();
 		list.add(product);
+		
+		existingId = 1L;
+		nonExistingId = 3L;
 
 		Mockito.when(repository.findAll((Pageable) ArgumentMatchers.any())).thenReturn(page);
 		Mockito.when(repository.findAll()).thenReturn(list);
+		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
+		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
 
 	}
 
@@ -70,4 +82,23 @@ public class ProductServiceTest {
 		Assertions.assertNotNull(result);
 		Mockito.verify(repository).findAll();
 	}
+	
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExist() {
+		
+		ProductDTO result = service.findById(existingId);
+		
+		Assertions.assertNotNull(result);
+		Mockito.verify(repository).findById(existingId);
+	}
+	
+	@Test
+	public void findByIdShouldThrowResourceNotFoundExceptionWhenIdNoExist() {
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.findById(nonExistingId);
+		});
+		Mockito.verify(repository).findById(nonExistingId);
+	}
+	
 }
