@@ -2,6 +2,7 @@ package com.gtecnologia.GTinventory.factory;
 
 import java.time.Instant;
 
+import com.gtecnologia.GTinventory.dtos.ProductDTO;
 import com.gtecnologia.GTinventory.entities.Category;
 import com.gtecnologia.GTinventory.entities.Product;
 
@@ -22,4 +23,8 @@ public class Factory {
 		return new Category(1L, "Eletronics");
 	}
 	
+	public static ProductDTO createProductDTO() {
+		Product product = createProduct();
+		return new ProductDTO(product);
+	}
 }

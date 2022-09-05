@@ -36,6 +36,7 @@ public class ProductServiceTest {
 	private ProductRepository repository;
 
 	private Product product;
+	private ProductDTO productDTO;
 	private PageImpl<Product> page;
 	private List<Product> list;
 	
@@ -46,6 +47,7 @@ public class ProductServiceTest {
 	void setUp() throws Exception {
 
 		product = Factory.createProduct();
+		productDTO = Factory.createProductDTO();
 		page = new PageImpl<>(List.of(product));
 
 		list = new ArrayList<>();
@@ -58,6 +60,7 @@ public class ProductServiceTest {
 		Mockito.when(repository.findAll()).thenReturn(list);
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
+		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
 
 	}
 
@@ -99,6 +102,15 @@ public class ProductServiceTest {
 			service.findById(nonExistingId);
 		});
 		Mockito.verify(repository).findById(nonExistingId);
+	}
+	
+	@Test
+	public void insertShouldReturnProductDTO() {
+
+		ProductDTO dto = service.insert(productDTO);
+
+		Assertions.assertNotNull(dto);
+		Mockito.verify(repository).save(ArgumentMatchers.any());
 	}
 	
 }
