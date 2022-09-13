@@ -1,6 +1,7 @@
 package com.gtecnologia.GTinventory.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
 import com.gtecnologia.GTinventory.factory.Factory;
 import com.gtecnologia.GTinventory.services.ProductService;
+import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @WebMvcTest(ProductController.class)
 public class ProductControllerTests {
@@ -34,6 +36,9 @@ public class ProductControllerTests {
 	private PageImpl<ProductDTO> page;
 	private ProductDTO productDTO;
 	private List<ProductDTO> list;
+	
+	private long existingId;
+	private long nonExistingId;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -44,8 +49,15 @@ public class ProductControllerTests {
 		list = new ArrayList<>();
 		list.add(productDTO);
 		
+		existingId = 1L;
+		nonExistingId = 2L;
+		
 		Mockito.when(service.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
 		Mockito.when(service.findAll()).thenReturn(list);
+		
+		Mockito.when(service.findById(existingId)).thenReturn(productDTO);
+		Mockito.when(service.findById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
+
 	}
 
 	@Test
@@ -64,6 +76,28 @@ public class ProductControllerTests {
 				.accept(MediaType.APPLICATION_JSON));
 
 		result.andExpect(status().isOk());
+	}
+	
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExists() throws Exception {
+		
+		ResultActions result = mockMvc.perform(get("/products/{id}", existingId)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("$.id").exists());
+		result.andExpect(jsonPath("$.name").exists());
+		result.andExpect(jsonPath("$.description").exists());
+		result.andExpect(jsonPath("$.price").exists());
+	}
+	
+	@Test 
+	public void findByIdShouldReturnNotFoundWhenIdDoesNotExists() throws Exception {
+		
+		ResultActions result = mockMvc.perform(get("/products/{id}", nonExistingId)
+				.accept(MediaType.APPLICATION_JSON));
+		
+			result.andExpect(status().isNotFound());
 	}
 
 }
