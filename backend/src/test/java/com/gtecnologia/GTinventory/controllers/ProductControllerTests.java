@@ -3,6 +3,7 @@ package com.gtecnologia.GTinventory.controllers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
 import com.gtecnologia.GTinventory.factory.Factory;
 import com.gtecnologia.GTinventory.services.ProductService;
+import com.gtecnologia.GTinventory.services.exception.DatabaseException;
 import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @WebMvcTest(ProductController.class)
@@ -48,6 +50,7 @@ public class ProductControllerTests {
 	
 	private long existingId;
 	private long nonExistingId;
+	private long dependentId;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -60,6 +63,7 @@ public class ProductControllerTests {
 		
 		existingId = 1L;
 		nonExistingId = 2L;
+		dependentId = 3L;
 		
 		Mockito.when(service.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
 		Mockito.when(service.findAll()).thenReturn(list);
@@ -70,7 +74,10 @@ public class ProductControllerTests {
 		when(service.insert(any())).thenReturn(productDTO);
 		when(service.update(eq(existingId), any())).thenReturn(productDTO);
 		when(service.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
-
+		
+		Mockito.doNothing().when(service).delete(existingId);
+		Mockito.doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
+		Mockito.doThrow(DatabaseException.class).when(service).delete(dependentId);
 
 	}
 
@@ -160,6 +167,34 @@ public class ProductControllerTests {
 				.accept(MediaType.APPLICATION_JSON));
 		
 		result.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void deleteShouldReturnNoContentwhenIdExist ()throws Exception {
+		
+		ResultActions result = mockMvc.perform(delete("/products/{id}", existingId)
+				.accept(MediaType.APPLICATION_JSON));
+
+		result.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void deleteShouldReturnNotFounWhenDoesIdNoExist() throws Exception {
+		
+		ResultActions result = mockMvc.perform(delete("/products{id}", nonExistingId)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void deleteShouldReturnBadRequestWhenDependentId() throws Exception{
+		
+		ResultActions result = mockMvc.perform(delete("/products/{id}", dependentId)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isBadRequest());
+		
 	}
 
 }
