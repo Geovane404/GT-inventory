@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
+import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @SpringBootTest
 public class ProductServiceIT {
@@ -20,10 +21,14 @@ public class ProductServiceIT {
 	private ProductService service;
 	
 	private long countTotalProduct;
+	private long existingId;
+	private long nonExistingId;
 	
 	@BeforeEach
 	void setUp() throws Exception{
 		countTotalProduct = 25L;
+		existingId = 1L;
+		nonExistingId = 1000L;
 	}
 	
 	
@@ -73,4 +78,23 @@ public class ProductServiceIT {
 		
 		Assertions.assertFalse(result.isEmpty());	
 	}
+	
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExist() {
+		
+		ProductDTO result = service.findById(existingId);
+		
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(existingId, result.getId());
+	}
+	
+	@Test
+	public void findByIdShouldThrowResourceNotFoundExceptionWhenIdNoExist() {
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.findById(nonExistingId);
+		});
+		
+	}
+	
 }
