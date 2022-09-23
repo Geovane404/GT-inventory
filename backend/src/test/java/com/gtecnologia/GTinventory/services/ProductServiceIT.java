@@ -10,16 +10,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
 import com.gtecnologia.GTinventory.factory.Factory;
+import com.gtecnologia.GTinventory.repositories.ProductRepository;
 import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
+
 @SpringBootTest
+@Transactional
 public class ProductServiceIT {
 	
 	@Autowired
 	private ProductService service;
+	
+	@Autowired
+	private ProductRepository repository;
 	
 	private long countTotalProduct;
 	private long existingId;
@@ -129,5 +136,20 @@ public class ProductServiceIT {
 			service.update(nonExistingId, productDTO);
 		});
 	}	
+	
+	@Test
+	public void deleteShouldDeleteResourceWhenIdExist() {
+
+		service.delete(existingId);
+		Assertions.assertEquals(countTotalProduct - 1, repository.count());
+	}
+	
+	@Test
+	public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.delete(nonExistingId);
+		});
+	}
 	
 }
