@@ -111,4 +111,23 @@ public class ProductServiceIT {
 		Assertions.assertEquals(productDTO.getName(), dto.getName());
 	}	
 	
+
+	@Test
+	public void updateShoulReturnProductDTOWhenIdExist() {
+		
+		ProductDTO dto = service.update(existingId, productDTO);
+		
+		Assertions.assertNotNull(dto);
+		Assertions.assertEquals(productDTO.getId(), dto.getId());
+		Assertions.assertEquals(productDTO.getName(), dto.getName());
+	}	
+	
+	@Test
+	public void updateShouldThrowResourceNotFoundExceptionWhenIdNoExist() {
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.update(nonExistingId, productDTO);
+		});
+	}	
+	
 }
