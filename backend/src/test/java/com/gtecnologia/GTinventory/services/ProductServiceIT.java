@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
+import com.gtecnologia.GTinventory.factory.Factory;
 import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
 
 @SpringBootTest
@@ -24,11 +25,15 @@ public class ProductServiceIT {
 	private long existingId;
 	private long nonExistingId;
 	
+	private ProductDTO productDTO;
+	
 	@BeforeEach
 	void setUp() throws Exception{
 		countTotalProduct = 25L;
 		existingId = 1L;
 		nonExistingId = 1000L;
+		
+		productDTO = Factory.createProductDTO();
 	}
 	
 	
@@ -96,5 +101,14 @@ public class ProductServiceIT {
 		});
 		
 	}
+	
+	@Test
+	public void insertShouldReturnProductDTO() {
+		
+		ProductDTO dto = service.insert(productDTO);
+		
+		Assertions.assertNotNull(dto);
+		Assertions.assertEquals(productDTO.getName(), dto.getName());
+	}	
 	
 }
