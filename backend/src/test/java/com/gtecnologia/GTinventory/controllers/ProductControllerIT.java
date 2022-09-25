@@ -23,11 +23,15 @@ public class ProductControllerIT {
 	private MockMvc mockMvc;
 	
 	private long countTotalProduct;
+	private long existingid;
+	private long nonExistingId;
 	
 	@BeforeEach
 	void setUp() throws Exception{
 		
 		countTotalProduct = 25L;
+		existingid = 1L;
+		nonExistingId = 1000L;
 	}
 	
 	
@@ -63,4 +67,25 @@ public class ProductControllerIT {
 		result.andExpect(status().isOk());
 	}
 	
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExists() throws Exception{
+		
+		ResultActions result = mockMvc.perform(get("/products/{id}", existingid)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isOk());
+		result.andExpect(jsonPath("$.id").exists());
+		result.andExpect(jsonPath("$.name").exists());
+		result.andExpect(jsonPath("$.description").exists());
+		result.andExpect(jsonPath("$.price").exists());
+	}	
+	
+	@Test
+	public void findByIdShouldReturnNotFoundWhenIdDoesNotExists() throws Exception {
+
+		ResultActions result = mockMvc.perform(get("/products/{id}", nonExistingId)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isNotFound());
+	}
 }
