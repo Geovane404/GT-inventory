@@ -1,5 +1,6 @@
 package com.gtecnologia.GTinventory.controllers;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -150,6 +151,24 @@ public class ProductControllerIT {
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON));
 
+		result.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	public void deleteShouldReturnNoContentwhenIdExist() throws Exception {
+		
+		ResultActions result = mockMvc.perform(delete("/products/{id}", existingid)
+				.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void deleteShouldReturnNotFounWhenDoesIdNoExist() throws Exception {
+		
+		ResultActions result = mockMvc.perform(delete("/products/{id}", nonExistingId)
+				.accept(MediaType.APPLICATION_JSON));
+		
 		result.andExpect(status().isNotFound());
 	}
 }
