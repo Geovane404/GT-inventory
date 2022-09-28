@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gtecnologia.GTinventory.dtos.RoleDTO;
 import com.gtecnologia.GTinventory.dtos.UserDTO;
+import com.gtecnologia.GTinventory.dtos.UserInsertDTO;
 import com.gtecnologia.GTinventory.entities.Role;
 import com.gtecnologia.GTinventory.entities.User;
 import com.gtecnologia.GTinventory.repositories.RoleRepository;
@@ -55,10 +56,11 @@ public class UserService {
 	}
 	
 	@Transactional
-	public UserDTO insert(UserDTO dto) {
+	public UserDTO insert(UserInsertDTO dto) {
 
 		User entity = new User();
 		copyDtoToEntity(entity, dto);
+		entity.setPassword(dto.getPassword());
 		entity = repository.save(entity);
 		return new UserDTO(entity);
 	}
