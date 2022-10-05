@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.gtecnologia.GTinventory.dtos.UserDTO;
 import com.gtecnologia.GTinventory.dtos.UserInsertDTO;
+import com.gtecnologia.GTinventory.dtos.UserUpdateDTO;
 import com.gtecnologia.GTinventory.services.UserService;
 
 @RestController
@@ -63,10 +64,10 @@ public class UserController {
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<UserDTO>update(@PathVariable Long id, @Valid @RequestBody UserDTO dto) {
+	public ResponseEntity<UserDTO>update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
 		
-		dto = service.update(id, dto);
-		return ResponseEntity.ok().body(dto);
+		UserDTO newDto = service.update(id, dto);
+		return ResponseEntity.ok().body(newDto);
 	}
 
 	@DeleteMapping(value = "/{id}")

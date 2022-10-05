@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gtecnologia.GTinventory.dtos.RoleDTO;
 import com.gtecnologia.GTinventory.dtos.UserDTO;
 import com.gtecnologia.GTinventory.dtos.UserInsertDTO;
+import com.gtecnologia.GTinventory.dtos.UserUpdateDTO;
 import com.gtecnologia.GTinventory.entities.Role;
 import com.gtecnologia.GTinventory.entities.User;
 import com.gtecnologia.GTinventory.repositories.RoleRepository;
@@ -70,7 +71,7 @@ public class UserService {
 	}
 	
 	@Transactional
-	public UserDTO update(Long id, UserDTO dto) {
+	public UserDTO update(Long id, UserUpdateDTO dto) {
 
 		try {
 			User entity = repository.getOne(id);
