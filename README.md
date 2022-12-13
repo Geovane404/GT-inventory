@@ -16,6 +16,8 @@ utilizado para realizar autorizações de acordo com o perfil do usuário logado
 ## Modelo conceitual
 ![Modelo Conceitual](https://user-images.githubusercontent.com/65828907/207138168-8bf9d174-b749-45b2-a21a-8ba4df9e6ddd.png)
 
+## Collection Postman
+https://raw.githubusercontent.com/Geovane404/GT-inventory/main/GT-inventory.postman_collection.json
 
 ## Tecnologias utilizadas
 - Java
