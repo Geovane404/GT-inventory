@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.gtecnologia.GTinventory.services.exception.DatabaseException;
+import com.gtecnologia.GTinventory.services.exception.ForbiddenException;
 import com.gtecnologia.GTinventory.services.exception.ResourceNotFoundException;
+import com.gtecnologia.GTinventory.services.exception.UnauthorizedException;
 
 @ControllerAdvice
 public class ResourceExceptionHandler {
@@ -64,6 +66,24 @@ public class ResourceExceptionHandler {
 			
 			err.addErrror(error.getField(), error.getDefaultMessage());
 		}
+
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(ForbiddenException.class)
+	public ResponseEntity<OAuthCustomError> forbidden(ForbiddenException e) {
+
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		OAuthCustomError err = new OAuthCustomError("Forbidden", e.getMessage());
+
+		return ResponseEntity.status(status).body(err);
+	}
+
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<OAuthCustomError> unauthorized(UnauthorizedException e) {
+
+		HttpStatus status = HttpStatus.UNAUTHORIZED;
+		OAuthCustomError err = new OAuthCustomError("Unauthorized", e.getMessage());
 
 		return ResponseEntity.status(status).body(err);
 	}
