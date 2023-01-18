@@ -7,7 +7,7 @@
 **GT-Inventory** é uma aplicação BackEnd de web services implementada com **Spring Boot, JPA, Testes, Validações e Segurança**. 
 O Sistema disponibiliza APIs REST com CRUD completo de produtos, categorias e usuários. 
 
-Na aplicação foram realizadas implementações de testes **Unitários** e **Integração** para validar os recursos disponibilizados pelo sitema. 
+Na aplicação foram realizadas implementações de testes **Unitários** e **Integração** para validar os recursos disponibilizados pelo sistema. 
 
 A aplicação possui validações utilizando a biblioteca do **Bean Validation** para validar algumas regras para manipulação de dados. O sistema conta ainda com implementação de segurança
 utilizando o padrão **OAuth2** e o formato de token **JWT** onde, após a autenticação no sistema pelo usuário, o mesmo disponibiliza um **Token** que sera 
