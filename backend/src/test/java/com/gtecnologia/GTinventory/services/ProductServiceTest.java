@@ -1,5 +1,7 @@
 package com.gtecnologia.GTinventory.services;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
-import com.gtecnologia.GTinventory.entities.Category;
 import com.gtecnologia.GTinventory.entities.Product;
 import com.gtecnologia.GTinventory.factory.Factory;
 import com.gtecnologia.GTinventory.repositories.CategoryRepository;
@@ -67,6 +68,8 @@ public class ProductServiceTest {
 		dependentID = 2;
 
 		Mockito.when(repository.findAll((Pageable) ArgumentMatchers.any())).thenReturn(page);
+		Mockito.when(repository.find(any(), any(), any())).thenReturn(page);
+
 		Mockito.when(repository.findAll()).thenReturn(list);
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
@@ -85,11 +88,11 @@ public class ProductServiceTest {
 
 		Pageable pageable = PageRequest.of(0, 12);
 
-		Page<ProductDTO> result = service.findAllPaged(pageable);
+		Page<ProductDTO> result = service.findAllPaged(0L, "", pageable);
 
 		Assertions.assertNotNull(result);
 		Assertions.assertFalse(result.isEmpty());
-		Mockito.verify(repository, Mockito.times(1)).findAll(pageable);
+		Mockito.verify(repository, Mockito.times(1)).find(any(), any(), any());
 	}
 
 	@Test

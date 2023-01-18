@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gtecnologia.GTinventory.dtos.ProductDTO;
 import com.gtecnologia.GTinventory.factory.Factory;
+import com.gtecnologia.GTinventory.test.TokenUtil;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,11 +33,17 @@ public class ProductControllerIT {
 	@Autowired
 	private ObjectMapper objectMapper;
 	
+	@Autowired
+	private TokenUtil tokenUtil;
+	
 	private long countTotalProduct;
 	private long existingid;
 	private long nonExistingId;
 	
 	private ProductDTO productDTO;
+	
+	private String username;
+	private String password;
 	
 	@BeforeEach
 	void setUp() throws Exception{
@@ -46,6 +53,8 @@ public class ProductControllerIT {
 		nonExistingId = 1000L;
 		
 		productDTO = Factory.createProductDTO();
+		username = "maria@gmail.com";
+		password = "123456";
 	}
 	
 	
@@ -106,9 +115,12 @@ public class ProductControllerIT {
 	@Test
 	public void insertShouldReturnStatusCreatedAndProductDTO() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
+		
 		String jsonBody = objectMapper.writeValueAsString(productDTO);
 		
 		ResultActions result = mockMvc.perform(post("/products/")
+				.header("Authorization", "Bearer " + accessToken)
 				.content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON));
@@ -125,9 +137,12 @@ public class ProductControllerIT {
 	@Test
 	public void updateShouldReturnProductDTOWhenIdExists() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
+
 		String jsonBody = objectMapper.writeValueAsString(productDTO);
 		
 		ResultActions result = mockMvc.perform(put("/products/{id}", existingid)
+				.header("Authorization", "Bearer " + accessToken)
 				.content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON));
@@ -144,9 +159,12 @@ public class ProductControllerIT {
 	@Test
 	public void updateShouldNotFoundWhenIdDoesNotExists() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
+
 		String jsonBody = objectMapper.writeValueAsString(productDTO);
 		
 		ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId)
+				.header("Authorization", "Bearer " + accessToken)
 				.content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON));
@@ -157,7 +175,10 @@ public class ProductControllerIT {
 	@Test
 	public void deleteShouldReturnNoContentwhenIdExist() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
+
 		ResultActions result = mockMvc.perform(delete("/products/{id}", existingid)
+				.header("Authorization", "Bearer " + accessToken)
 				.accept(MediaType.APPLICATION_JSON));
 		
 		result.andExpect(status().isNoContent());
@@ -166,7 +187,10 @@ public class ProductControllerIT {
 	@Test
 	public void deleteShouldReturnNotFounWhenDoesIdNoExist() throws Exception {
 		
+		String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
+
 		ResultActions result = mockMvc.perform(delete("/products/{id}", nonExistingId)
+				.header("Authorization", "Bearer " + accessToken)
 				.accept(MediaType.APPLICATION_JSON));
 		
 		result.andExpect(status().isNotFound());
